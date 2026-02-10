@@ -242,10 +242,42 @@ function computeMappingJs(sourceRGB, targetRGB) {
   }
   const sourceList = buildBrightnessList(sourceRGB);
   const targetList = buildBrightnessList(targetRGB);
-  const mapping = new Int32Array(sourceList.length);
-  for (let i = 0; i < sourceList.length; i += 1) {
-    mapping[sourceList[i].index] = targetList[i].index;
+
+  // Split into "active" and "background" to reduce wasted pixels on black bars.
+  const threshold = 20;
+  const sourceActive = [];
+  const sourceBg = [];
+  for (const item of sourceList) {
+    if (item.brightness > threshold) {
+      sourceActive.push(item);
+    } else {
+      sourceBg.push(item);
+    }
   }
+
+  const targetActive = [];
+  const targetBg = [];
+  for (const item of targetList) {
+    if (item.brightness > threshold) {
+      targetActive.push(item);
+    } else {
+      targetBg.push(item);
+    }
+  }
+
+  const mapping = new Int32Array(sourceList.length);
+  const activeCount = Math.min(sourceActive.length, targetActive.length);
+  for (let i = 0; i < activeCount; i += 1) {
+    mapping[sourceActive[i].index] = targetActive[i].index;
+  }
+
+  // Map remaining pixels to remaining positions to keep a full permutation.
+  const sourceRest = sourceActive.slice(activeCount).concat(sourceBg);
+  const targetRest = targetActive.slice(activeCount).concat(targetBg);
+  for (let i = 0; i < sourceRest.length; i += 1) {
+    mapping[sourceRest[i].index] = targetRest[i].index;
+  }
+
   return mapping;
 }
 
