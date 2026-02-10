@@ -1,3 +1,5 @@
+import createModule from "../wasm/build/morph.js";
+
 const CANVAS_SIZE = 256;
 
 const sourceCanvas = document.getElementById("sourceCanvas");
@@ -16,6 +18,10 @@ const targetCtx = targetCanvas.getContext("2d");
 
 let latestSourceRGB = null;
 let latestTargetRGB = null;
+let latestMapping = null;
+
+let wasmApi = null;
+let wasmReady = false;
 
 function clearCanvas(ctx) {
   ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
@@ -38,6 +44,7 @@ function loadTarget() {
   img.onload = () => {
     drawImageToCanvas(img, targetCtx);
     outputCtx.drawImage(targetCanvas, 0, 0);
+    captureRGBInputs();
   };
   img.src = TARGET_URL;
 }
@@ -64,6 +71,57 @@ function captureRGBInputs() {
 
   latestSourceRGB = extractRGB(sourcePixels);
   latestTargetRGB = extractRGB(targetPixels);
+
+  if (wasmReady) {
+    latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+  }
+}
+
+function initWasm() {
+  createModule({
+    locateFile: (path) => new URL(`../wasm/build/${path}`, import.meta.url).toString(),
+  }).then((module) => {
+    wasmApi = {
+      module,
+      computeMapping: module.cwrap("compute_mapping", null, [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+      ]),
+    };
+    wasmReady = true;
+
+    if (latestSourceRGB && latestTargetRGB) {
+      latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+    }
+  });
+}
+
+function computeMappingWasm(sourceRGB, targetRGB) {
+  const count = CANVAS_SIZE * CANVAS_SIZE;
+  const sourceBytes = sourceRGB.length;
+  const targetBytes = targetRGB.length;
+  const mapBytes = count * 4;
+
+  const sourcePtr = wasmApi.module._malloc(sourceBytes);
+  const targetPtr = wasmApi.module._malloc(targetBytes);
+  const mapPtr = wasmApi.module._malloc(mapBytes);
+
+  wasmApi.module.HEAPU8.set(sourceRGB, sourcePtr);
+  wasmApi.module.HEAPU8.set(targetRGB, targetPtr);
+
+  wasmApi.computeMapping(sourcePtr, targetPtr, CANVAS_SIZE, CANVAS_SIZE, mapPtr);
+
+  const mappingView = wasmApi.module.HEAP32.subarray(mapPtr / 4, mapPtr / 4 + count);
+  const mapping = new Int32Array(mappingView);
+
+  wasmApi.module._free(sourcePtr);
+  wasmApi.module._free(targetPtr);
+  wasmApi.module._free(mapPtr);
+
+  return mapping;
 }
 
 function loadInput(file) {
@@ -88,3 +146,4 @@ fileInput.addEventListener("change", (event) => {
 
 clearCanvas(sourceCtx);
 loadTarget();
+initWasm();
