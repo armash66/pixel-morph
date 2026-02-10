@@ -3,14 +3,17 @@ import createModule from "../wasm/build/morph.js";
 const CANVAS_SIZE = 256;
 const ANIMATION_MS = 3200;
 
-const sourceCanvas = document.getElementById("sourceCanvas");
 const outputCanvas = document.getElementById("outputCanvas");
 const fileInput = document.getElementById("fileInput");
 
-const sourceCtx = sourceCanvas.getContext("2d");
 const outputCtx = outputCanvas.getContext("2d");
 
-const TARGET_URL = "./assets/target.svg";
+const TARGET_URL = "./assets/ww2%20hero.png";
+
+const sourceCanvas = document.createElement("canvas");
+sourceCanvas.width = CANVAS_SIZE;
+sourceCanvas.height = CANVAS_SIZE;
+const sourceCtx = sourceCanvas.getContext("2d");
 
 const targetCanvas = document.createElement("canvas");
 targetCanvas.width = CANVAS_SIZE;
