@@ -363,13 +363,17 @@ inputCanvas.addEventListener("pointerdown", (event) => {
   drawing = true;
   inputCanvas.setPointerCapture(event.pointerId);
   const rect = inputCanvas.getBoundingClientRect();
-  beginDraw(event.clientX - rect.left, event.clientY - rect.top);
+  const scaleX = inputCanvas.width / rect.width;
+  const scaleY = inputCanvas.height / rect.height;
+  beginDraw((event.clientX - rect.left) * scaleX, (event.clientY - rect.top) * scaleY);
 });
 
 inputCanvas.addEventListener("pointermove", (event) => {
   if (!drawing) return;
   const rect = inputCanvas.getBoundingClientRect();
-  continueDraw(event.clientX - rect.left, event.clientY - rect.top);
+  const scaleX = inputCanvas.width / rect.width;
+  const scaleY = inputCanvas.height / rect.height;
+  continueDraw((event.clientX - rect.left) * scaleX, (event.clientY - rect.top) * scaleY);
 });
 
 inputCanvas.addEventListener("pointerup", () => {
