@@ -318,26 +318,34 @@ body {
 .hero__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 20px;
   justify-content: start;
 }
 
 .hero__meta span {
-  padding: 6px 10px;
-  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
   border: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-family: "JetBrains Mono", "Consolas", monospace;
   color: var(--muted);
+  text-align: center;
+  padding: 10px;
+  line-height: 1.4;
+  background: var(--bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
-  align-items: start;
 }
 
 .card {
