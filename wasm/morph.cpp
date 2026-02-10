@@ -2,57 +2,53 @@
 #include <cstdint>
 #include <vector>
 
-#include <emscripten/emscripten.h>
-
-extern "C" {
+struct PixelInfo {
+  float brightness;
+  int index;
+};
 
 // r,g,b are 0..255. Returns brightness in 0..255 range.
-EMSCRIPTEN_KEEPALIVE
 float brightness(uint8_t r, uint8_t g, uint8_t b) {
   return 0.2126f * r + 0.7152f * g + 0.0722f * b;
 }
 
-// Build brightness array from RGBA pixels.
-// pixels: length = width*height*4
-// out_brightness: length = width*height
-EMSCRIPTEN_KEEPALIVE
-void compute_brightness(const uint8_t* pixels, int width, int height, float* out_brightness) {
+// Convert RGB pixels into (brightness, index) list.
+// pixels: length = width*height*3 in RGB order.
+std::vector<PixelInfo> build_brightness_list(const std::vector<uint8_t>& pixels, int width, int height) {
   const int count = width * height;
+  std::vector<PixelInfo> list(count);
   for (int i = 0; i < count; i++) {
-    const int idx = i * 4;
-    out_brightness[i] = brightness(pixels[idx], pixels[idx + 1], pixels[idx + 2]);
+    const int idx = i * 3;
+    const uint8_t r = pixels[idx];
+    const uint8_t g = pixels[idx + 1];
+    const uint8_t b = pixels[idx + 2];
+    list[i] = {brightness(r, g, b), i};
   }
+  return list;
 }
 
-// Sort indices by brightness ascending.
-// brightness: length = count
-// out_indices: length = count
-EMSCRIPTEN_KEEPALIVE
-void sort_indices_by_brightness(const float* brightness_values, int count, int* out_indices) {
-  std::vector<int> indices(count);
+// Compute mapping from source indices to target indices by sorting brightness.
+// mapping[source_index] = target_index
+std::vector<int> compute_mapping(const std::vector<uint8_t>& source_pixels,
+                                 const std::vector<uint8_t>& target_pixels,
+                                 int width,
+                                 int height) {
+  const int count = width * height;
+
+  std::vector<PixelInfo> source_list = build_brightness_list(source_pixels, width, height);
+  std::vector<PixelInfo> target_list = build_brightness_list(target_pixels, width, height);
+
+  std::sort(source_list.begin(), source_list.end(),
+            [](const PixelInfo& a, const PixelInfo& b) { return a.brightness < b.brightness; });
+  std::sort(target_list.begin(), target_list.end(),
+            [](const PixelInfo& a, const PixelInfo& b) { return a.brightness < b.brightness; });
+
+  std::vector<int> mapping(count);
   for (int i = 0; i < count; i++) {
-    indices[i] = i;
+    const int src_index = source_list[i].index;
+    const int tgt_index = target_list[i].index;
+    mapping[src_index] = tgt_index;
   }
 
-  std::sort(indices.begin(), indices.end(), [&](int a, int b) {
-    return brightness_values[a] < brightness_values[b];
-  });
-
-  for (int i = 0; i < count; i++) {
-    out_indices[i] = indices[i];
-  }
-}
-
-// Build mapping from source index -> target index using sorted brightness order.
-// src_sorted and tgt_sorted are sorted index arrays (length = count).
-// out_map: length = count (out_map[src_index] = tgt_index)
-EMSCRIPTEN_KEEPALIVE
-void build_mapping(const int* src_sorted, const int* tgt_sorted, int count, int* out_map) {
-  for (int i = 0; i < count; i++) {
-    const int src_index = src_sorted[i];
-    const int tgt_index = tgt_sorted[i];
-    out_map[src_index] = tgt_index;
-  }
-}
-
+  return mapping;
 }
