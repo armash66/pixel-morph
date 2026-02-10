@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 
-// Pure math model for pixel rearrangement.
+// Pure math model for pixel rearrangement (WASM-safe C API).
 // No I/O. No rendering. No external libraries.
 
 struct PixelInfo {
@@ -39,15 +39,15 @@ static void sort_by_brightness(std::vector<PixelInfo>& list) {
             [](const PixelInfo& a, const PixelInfo& b) { return a.brightness < b.brightness; });
 }
 
-// Compute permutation mapping using pure math rules.
+// C-style API for WASM: compute permutation mapping.
 // mapping[source_index] = target_index
 // source_pixels / target_pixels: flat RGB arrays length = width*height*3
 // mapping: output array length = width*height (must be allocated by caller)
-void compute_mapping(const uint8_t* source_pixels,
-                     const uint8_t* target_pixels,
-                     int width,
-                     int height,
-                     int* mapping) {
+extern "C" void compute_mapping(const uint8_t* source_pixels,
+                                const uint8_t* target_pixels,
+                                int width,
+                                int height,
+                                int* mapping) {
   const int count = width * height;
 
   std::vector<PixelInfo> source_list;

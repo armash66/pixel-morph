@@ -18,6 +18,6 @@ emcc `
   -s EXPORT_ES6=1 `
   -s ENVIRONMENT=web `
   -s ALLOW_MEMORY_GROWTH=1 `
-  -s EXPORTED_FUNCTIONS="[_brightness,_compute_brightness,_sort_indices_by_brightness,_build_mapping,_malloc,_free]" `
+  -s EXPORTED_FUNCTIONS="[_compute_mapping,_malloc,_free]" `
   -s EXPORTED_RUNTIME_METHODS="['ccall','cwrap','getValue','setValue']" `
   -o "$outDir/morph.js"
