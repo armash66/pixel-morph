@@ -1,0 +1,85 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --text: #e5e7eb;
+  --muted: #9aa2b1;
+  --accent: #f97316;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #1f2430, #0f1115 60%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.header h1 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  letter-spacing: 0.5px;
+}
+
+.header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.controls {
+  margin: 24px 0 28px;
+}
+
+.upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border: 1px solid #2b2f3a;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.upload input {
+  display: none;
+}
+
+.canvases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+figure {
+  margin: 0;
+  background: var(--panel);
+  border: 1px solid #242833;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+figcaption {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #0b0d12;
+  border-radius: 8px;
+  border: 1px solid #242833;
+}
