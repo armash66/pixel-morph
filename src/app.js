@@ -3,10 +3,16 @@ import createModule from "../wasm/build/morph.js";
 const CANVAS_SIZE = 256;
 const ANIMATION_MS = 3200;
 
+const inputCanvas = document.getElementById("inputCanvas");
 const outputCanvas = document.getElementById("outputCanvas");
 const fileInput = document.getElementById("fileInput");
+const targetInput = document.getElementById("targetInput");
 const debugToggle = document.getElementById("debugToggle");
+const metricEngine = document.getElementById("metricEngine");
+const metricProgress = document.getElementById("metricProgress");
+const metricSimilarity = document.getElementById("metricSimilarity");
 
+const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
 
 const targetUrl = "./assets/target-cat.svg";
@@ -29,6 +35,7 @@ let animationId = null;
 let animationStart = 0;
 let warnedWasmUnavailable = false;
 let debugMode = false;
+let latestSimilarity = null;
 
 let wasmApi = null;
 let wasmReady = false;
@@ -58,6 +65,19 @@ function loadTarget() {
   img.src = targetUrl;
 }
 
+function loadTargetFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      drawImageToCanvas(img, targetCtx);
+      captureRGBInputs();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function extractRGB(imageData) {
   const data = imageData.data;
   const count = CANVAS_SIZE * CANVAS_SIZE;
@@ -84,6 +104,8 @@ function captureRGBInputs() {
 
   latestMapping = computeMappingWithFallback(latestSourceRGB, latestTargetRGB);
   if (latestMapping) {
+    latestSimilarity = computeSimilarity(latestSourceRGBA, latestTargetRGB, latestMapping);
+    updateSimilarityMetric();
     startMorphAnimation();
   }
 }
@@ -124,17 +146,25 @@ async function initWasm() {
 
     wasmApi = { module, computeMapping };
     wasmReady = true;
+    if (metricEngine) {
+      metricEngine.textContent = "WASM";
+    }
 
     if (latestSourceRGB && latestTargetRGB) {
       const mapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
       if (mapping) {
         latestMapping = mapping;
+        latestSimilarity = computeSimilarity(latestSourceRGBA, latestTargetRGB, latestMapping);
+        updateSimilarityMetric();
         startMorphAnimation();
       }
     }
   } catch (err) {
     wasmReady = false;
     // Silent fallback to JS mapping.
+    if (metricEngine) {
+      metricEngine.textContent = "JS";
+    }
   }
 }
 
@@ -173,11 +203,17 @@ function computeMappingWasm(sourceRGB, targetRGB) {
 function computeMappingWithFallback(sourceRGB, targetRGB) {
   const mapping = computeMappingWasm(sourceRGB, targetRGB);
   if (mapping) {
+    if (metricEngine) {
+      metricEngine.textContent = "WASM";
+    }
     return mapping;
   }
 
   if (!warnedWasmUnavailable) {
     warnedWasmUnavailable = true;
+  }
+  if (metricEngine) {
+    metricEngine.textContent = "JS";
   }
   return computeMappingJs(sourceRGB, targetRGB);
 }
@@ -257,6 +293,10 @@ function renderMorphFrame(t) {
   const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
   const outData = out.data;
 
+  if (metricProgress) {
+    metricProgress.textContent = `${Math.round(t * 100)}%`;
+  }
+
   for (let i = 0; i < count; i += 1) {
     const targetIndex = latestMapping[i];
     const start = indexToXY(i);
@@ -315,6 +355,10 @@ function startMorphAnimation() {
     cancelAnimationFrame(animationId);
   }
 
+  if (metricProgress) {
+    metricProgress.textContent = "0%";
+  }
+
   animationStart = performance.now();
   animationId = requestAnimationFrame(animate);
 }
@@ -324,6 +368,7 @@ function loadInput(file) {
   reader.onload = () => {
     const img = new Image();
     img.onload = () => {
+      drawImageToCanvas(img, inputCtx);
       drawImageToCanvas(img, sourceCtx);
       captureRGBInputs();
     };
@@ -339,6 +384,13 @@ fileInput.addEventListener("change", (event) => {
   }
 });
 
+targetInput.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    loadTargetFromFile(file);
+  }
+});
+
 debugToggle.addEventListener("change", (event) => {
   debugMode = event.target.checked;
   if (latestMapping && latestSourceRGBA) {
@@ -347,7 +399,49 @@ debugToggle.addEventListener("change", (event) => {
 });
 
 
+clearCanvas(inputCtx);
 clearCanvas(sourceCtx);
 clearCanvas(outputCtx);
 loadTarget();
 initWasm();
+
+function computeSimilarity(sourceRGBA, targetRGB, mapping) {
+  if (!sourceRGBA || !targetRGB || !mapping) {
+    return null;
+  }
+  const count = CANVAS_SIZE * CANVAS_SIZE;
+  let sumSq = 0;
+  for (let i = 0; i < count; i += 1) {
+    const targetIndex = mapping[i];
+    const srcIdx = i * 4;
+    const outBrightness = brightnessOf(
+      sourceRGBA[srcIdx],
+      sourceRGBA[srcIdx + 1],
+      sourceRGBA[srcIdx + 2]
+    );
+    const tgtIdx = targetIndex * 3;
+    const tgtBrightness = brightnessOf(
+      targetRGB[tgtIdx],
+      targetRGB[tgtIdx + 1],
+      targetRGB[tgtIdx + 2]
+    );
+    const diff = outBrightness - tgtBrightness;
+    sumSq += diff * diff;
+  }
+
+  const mse = sumSq / count;
+  const maxMse = 255 * 255;
+  const score = Math.max(0, 1 - mse / maxMse);
+  return Math.round(score * 1000) / 10;
+}
+
+function updateSimilarityMetric() {
+  if (!metricSimilarity) {
+    return;
+  }
+  if (latestSimilarity === null) {
+    metricSimilarity.textContent = "--";
+    return;
+  }
+  metricSimilarity.textContent = `${latestSimilarity}%`;
+}

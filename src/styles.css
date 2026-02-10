@@ -1,9 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
 :root {
-  --bg: #0f1115;
-  --panel: #171a21;
-  --text: #e5e7eb;
-  --muted: #9aa2b1;
+  --bg: #0b0f14;
+  --panel: #111827;
+  --panel-2: #0f172a;
+  --text: #f8fafc;
+  --muted: #94a3b8;
   --accent: #f97316;
+  --accent-2: #22d3ee;
 }
 
 * {
@@ -12,21 +16,24 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: radial-gradient(circle at top, #1f2430, #0f1115 60%);
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%, #1f2937, transparent 45%),
+    radial-gradient(circle at 90% 10%, #0f766e, transparent 40%),
+    radial-gradient(circle at 50% 100%, #1e293b, #0b0f14 60%);
   color: var(--text);
   min-height: 100vh;
 }
 
 .wrap {
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
   padding: 32px 20px 48px;
 }
 
 .header h1 {
   margin: 0 0 6px;
-  font-size: 32px;
+  font-size: 36px;
   letter-spacing: 0.5px;
 }
 
@@ -43,16 +50,47 @@ body {
   align-items: center;
 }
 
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.metric {
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.95));
+  border: 1px solid #1f2a3d;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.metric .label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.metric .value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .upload {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  background: var(--panel);
-  border: 1px solid #2b2f3a;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  border: 1px solid #243244;
   border-radius: 10px;
   cursor: pointer;
   color: var(--text);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.4);
 }
 
 .upload input {
@@ -64,8 +102,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: var(--panel);
-  border: 1px solid #2b2f3a;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  border: 1px solid #243244;
   border-radius: 10px;
   cursor: pointer;
   color: var(--text);
@@ -79,31 +117,33 @@ body {
 
 
 .canvases {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
 }
 
 figure {
   margin: 0;
-  background: var(--panel);
-  border: 1px solid #242833;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.95));
+  border: 1px solid #1f2a3d;
   padding: 16px;
   border-radius: 12px;
-  width: 380px;
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.6);
 }
 
 figcaption {
   margin-bottom: 10px;
   color: var(--muted);
   font-size: 14px;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  letter-spacing: 0.04em;
 }
 
 canvas {
   width: 100%;
   height: auto;
   display: block;
-  background: #0b0d12;
+  background: #05070b;
   border-radius: 8px;
-  border: 1px solid #242833;
+  border: 1px solid #1f2a3d;
 }

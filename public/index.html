@@ -15,8 +15,12 @@
 
       <section class="controls">
         <label class="upload">
-          <span>Upload Image</span>
+          <span>Upload Input</span>
           <input id="fileInput" type="file" accept="image/*" />
+        </label>
+        <label class="upload">
+          <span>Upload Target</span>
+          <input id="targetInput" type="file" accept="image/*" />
         </label>
         <label class="toggle">
           <input id="debugToggle" type="checkbox" />
@@ -24,9 +28,28 @@
         </label>
       </section>
 
+      <section class="metrics">
+        <div class="metric">
+          <span class="label">Engine</span>
+          <span id="metricEngine" class="value">JS</span>
+        </div>
+        <div class="metric">
+          <span class="label">Progress</span>
+          <span id="metricProgress" class="value">0%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Similarity</span>
+          <span id="metricSimilarity" class="value">--</span>
+        </div>
+      </section>
+
       <section class="canvases">
         <figure>
-          <figcaption>Live Morph</figcaption>
+          <figcaption>Input</figcaption>
+          <canvas id="inputCanvas" width="256" height="256"></canvas>
+        </figure>
+        <figure>
+          <figcaption>Morph Output</figcaption>
           <canvas id="outputCanvas" width="256" height="256"></canvas>
         </figure>
       </section>
