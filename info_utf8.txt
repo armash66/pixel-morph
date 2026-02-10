@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -24,7 +24,7 @@
         <header class="header">
           <div>
             <h2>How It Works</h2>
-            <p>Brightness sorting → permutation mapping → morph animation.</p>
+            <p>Brightness sorting ? permutation mapping ? morph animation.</p>
           </div>
           <label class="theme-toggle">
             <input id="themeToggle" type="checkbox" />
@@ -35,7 +35,7 @@
         <section class="hero">
           <div>
             <h3>Permutation-Only Morphing</h3>
-            <p>We rearrange your pixels into the target's structure using brightness ordering. No recoloring. No AI.</p>
+            <p>We rearrange your pixels into the target’s structure using brightness ordering. No recoloring. No AI.</p>
           </div>
           <div class="hero__meta">
             <span>Pure Math</span>

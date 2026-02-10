@@ -1,4 +1,5 @@
-<!doctype html>
+const fs = require('fs');
+const content = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -110,3 +111,6 @@
     </script>
   </body>
 </html>
+`;
+fs.writeFileSync('public/info.html', content, 'utf8');
+console.log('Update complete');

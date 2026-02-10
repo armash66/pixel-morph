@@ -24,7 +24,7 @@ targetCanvas.width = CANVAS_SIZE;
 targetCanvas.height = CANVAS_SIZE;
 const targetCtx = targetCanvas.getContext("2d", { willReadFrequently: true });
 
-const targetUrl = "./assets/target-portrait-hi.svg";
+const targetUrl = "./assets/ww2%20hero.png";
 
 let latestSourceRGB = null;
 let latestTargetRGB = null;

@@ -18,7 +18,7 @@ const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
 const previewCtx = targetPreview ? targetPreview.getContext("2d") : null;
 
-const targetUrl = "./assets/target-portrait-hi.svg";
+const targetUrl = "./assets/ww2%20hero.png";
 
 const sourceCanvas = document.createElement("canvas");
 sourceCanvas.width = CANVAS_SIZE;
