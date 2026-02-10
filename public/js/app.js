@@ -133,7 +133,7 @@ function captureRGBInputs() {
 async function initWasm() {
   try {
     let module = await createModule({
-      locateFile: (path) => new URL(`../../wasm/build/${path}`, import.meta.url).toString(),
+      locateFile: (path) => new URL(`../wasm/build/${path}`, import.meta.url).toString(),
       onAbort: (reason) => console.error("WASM abort:", reason),
       printErr: (msg) => console.error("WASM stderr:", msg),
     });
