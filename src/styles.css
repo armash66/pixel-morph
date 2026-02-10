@@ -37,6 +37,10 @@ body {
 
 .controls {
   margin: 24px 0 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
 .upload {
@@ -53,6 +57,24 @@ body {
 
 .upload input {
   display: none;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid #2b2f3a;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.toggle input {
+  width: 16px;
+  height: 16px;
 }
 
 .canvases {

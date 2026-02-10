@@ -5,6 +5,7 @@ const ANIMATION_MS = 3200;
 
 const outputCanvas = document.getElementById("outputCanvas");
 const fileInput = document.getElementById("fileInput");
+const debugToggle = document.getElementById("debugToggle");
 
 const outputCtx = outputCanvas.getContext("2d");
 
@@ -27,6 +28,7 @@ let latestSourceRGBA = null;
 let animationId = null;
 let animationStart = 0;
 let warnedWasmUnavailable = false;
+let debugMode = false;
 
 let wasmApi = null;
 let wasmReady = false;
@@ -265,13 +267,33 @@ function renderMorphFrame(t) {
     const outIdx = (y * CANVAS_SIZE + x) * 4;
     const srcIdx = i * 4;
 
-    outData[outIdx] = latestSourceRGBA[srcIdx];
-    outData[outIdx + 1] = latestSourceRGBA[srcIdx + 1];
-    outData[outIdx + 2] = latestSourceRGBA[srcIdx + 2];
+    if (debugMode) {
+      const color = debugColor(i);
+      outData[outIdx] = color.r;
+      outData[outIdx + 1] = color.g;
+      outData[outIdx + 2] = color.b;
+    } else {
+      outData[outIdx] = latestSourceRGBA[srcIdx];
+      outData[outIdx + 1] = latestSourceRGBA[srcIdx + 1];
+      outData[outIdx + 2] = latestSourceRGBA[srcIdx + 2];
+    }
     outData[outIdx + 3] = 255;
   }
 
   outputCtx.putImageData(out, 0, 0);
+}
+
+function debugColor(index) {
+  // Simple integer hash -> RGB
+  let x = index + 1;
+  x = (x ^ (x >>> 16)) * 0x45d9f3b;
+  x = (x ^ (x >>> 16)) * 0x45d9f3b;
+  x = x ^ (x >>> 16);
+  return {
+    r: x & 255,
+    g: (x >>> 8) & 255,
+    b: (x >>> 16) & 255,
+  };
 }
 
 function animate(now) {
@@ -314,6 +336,13 @@ fileInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (file) {
     loadInput(file);
+  }
+});
+
+debugToggle.addEventListener("change", (event) => {
+  debugMode = event.target.checked;
+  if (latestMapping && latestSourceRGBA) {
+    startMorphAnimation();
   }
 });
 
