@@ -6,7 +6,7 @@
 
 **Pixel Forge** is a pure-math visualization experiment that rearranges pixels from a source image to match a target silhouette using deterministic brightness sorting. No AI. No neural networks. No blending. Just raw pixel manipulation.
 
-![Demo](public/assets/webss.png)
+![Demo](public/assets/websitess.png)
 
 ---
 
