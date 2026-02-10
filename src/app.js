@@ -9,7 +9,7 @@ const debugToggle = document.getElementById("debugToggle");
 
 const outputCtx = outputCanvas.getContext("2d");
 
-const TARGET_URL = "./assets/ww2%20hero.png";
+const targetUrl = "./assets/target-cat.svg";
 
 const sourceCanvas = document.createElement("canvas");
 sourceCanvas.width = CANVAS_SIZE;
@@ -55,7 +55,7 @@ function loadTarget() {
     drawImageToCanvas(img, targetCtx);
     captureRGBInputs();
   };
-  img.src = TARGET_URL;
+  img.src = targetUrl;
 }
 
 function extractRGB(imageData) {
@@ -345,6 +345,7 @@ debugToggle.addEventListener("change", (event) => {
     startMorphAnimation();
   }
 });
+
 
 clearCanvas(sourceCtx);
 clearCanvas(outputCtx);
