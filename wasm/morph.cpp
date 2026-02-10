@@ -43,6 +43,7 @@ static void sort_by_brightness(std::vector<PixelInfo>& list) {
 // mapping[source_index] = target_index
 // source_pixels / target_pixels: flat RGB arrays length = width*height*3
 // mapping: output array length = width*height (must be allocated by caller)
+// IMPORTANT: This is a permutation only. No recoloring. Input colors are preserved.
 extern "C" void compute_mapping(const uint8_t* source_pixels,
                                 const uint8_t* target_pixels,
                                 int width,

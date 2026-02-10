@@ -250,6 +250,7 @@ function renderMorphFrame(t) {
     return;
   }
 
+  // Permutation only: keep input colors, move to target positions.
   const count = CANVAS_SIZE * CANVAS_SIZE;
   const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
   const outData = out.data;
