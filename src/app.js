@@ -50,7 +50,6 @@ function loadTarget() {
   const img = new Image();
   img.onload = () => {
     drawImageToCanvas(img, targetCtx);
-    outputCtx.drawImage(targetCanvas, 0, 0);
     captureRGBInputs();
   };
   img.src = TARGET_URL;
@@ -240,5 +239,6 @@ fileInput.addEventListener("change", (event) => {
 });
 
 clearCanvas(sourceCtx);
+clearCanvas(outputCtx);
 loadTarget();
 initWasm();
