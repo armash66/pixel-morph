@@ -3,17 +3,17 @@ import createModule from "../wasm/build/morph.js";
 const CANVAS_SIZE = 256;
 const ANIMATION_MS = 3200;
 
-const inputCanvas = document.getElementById("inputCanvas");
-const outputCanvas = document.getElementById("outputCanvas");
-const targetPreview = document.getElementById("targetPreview");
-const targetInput = document.getElementById("targetInput");
-const debugToggle = document.getElementById("debugToggle");
-const brushSize = document.getElementById("brushSize");
-const clearBtn = document.getElementById("clearBtn");
-const metricEngine = document.getElementById("metricEngine");
-const metricProgress = document.getElementById("metricProgress");
-const metricSimilarity = document.getElementById("metricSimilarity");
-const themeToggle = document.getElementById("themeToggle");
+const inputCanvas = document.getElementById("scribbleInputCanvas");
+const outputCanvas = document.getElementById("scribbleOutputCanvas");
+const targetPreview = document.getElementById("scribbleTargetPreview");
+const targetInput = document.getElementById("scribbleTargetInput");
+const debugToggle = document.getElementById("scribbleDebugToggle");
+const brushSize = document.getElementById("scribbleBrushSize");
+const clearBtn = document.getElementById("scribbleClearBtn");
+const metricEngine = document.getElementById("scribbleMetricEngine");
+const metricProgress = document.getElementById("scribbleMetricProgress");
+const metricSimilarity = document.getElementById("scribbleMetricSimilarity");
+// themeToggle is handled in main.js
 const colorBtns = document.querySelectorAll(".color-btn");
 
 colorBtns.forEach((btn) => {
@@ -402,24 +402,7 @@ debugToggle.addEventListener("change", (event) => {
   }
 });
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  if (themeToggle) {
-    themeToggle.checked = theme === "light";
-  }
-}
-
-if (themeToggle) {
-  const saved = localStorage.getItem("pixelMorphTheme");
-  if (saved) {
-    applyTheme(saved);
-  }
-  themeToggle.addEventListener("change", (event) => {
-    const next = event.target.checked ? "light" : "dark";
-    localStorage.setItem("pixelMorphTheme", next);
-    applyTheme(next);
-  });
-}
+// Theme logic moved to main.js
 
 clearCanvas(inputCtx);
 clearCanvas(outputCtx);

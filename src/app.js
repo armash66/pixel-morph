@@ -3,16 +3,16 @@ import createModule from "../wasm/build/morph.js";
 const CANVAS_SIZE = 256;
 const ANIMATION_MS = 3200;
 
-const inputCanvas = document.getElementById("inputCanvas");
-const outputCanvas = document.getElementById("outputCanvas");
-const targetPreview = document.getElementById("targetPreview");
-const fileInput = document.getElementById("fileInput");
-const targetInput = document.getElementById("targetInput");
-const debugToggle = document.getElementById("debugToggle");
-const themeToggle = document.getElementById("themeToggle");
-const metricEngine = document.getElementById("metricEngine");
-const metricProgress = document.getElementById("metricProgress");
-const metricSimilarity = document.getElementById("metricSimilarity");
+const inputCanvas = document.getElementById("homeInputCanvas");
+const outputCanvas = document.getElementById("homeOutputCanvas");
+const targetPreview = document.getElementById("homeTargetPreview");
+const fileInput = document.getElementById("homeFileInput");
+const targetInput = document.getElementById("homeTargetInput");
+const debugToggle = document.getElementById("homeDebugToggle");
+// themeToggle is handled in main.js
+const metricEngine = document.getElementById("homeMetricEngine");
+const metricProgress = document.getElementById("homeMetricProgress");
+const metricSimilarity = document.getElementById("homeMetricSimilarity");
 
 const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
@@ -457,24 +457,7 @@ clearCanvas(outputCtx);
 loadTarget();
 initWasm();
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  if (themeToggle) {
-    themeToggle.checked = theme === "light";
-  }
-}
-
-if (themeToggle) {
-  const saved = localStorage.getItem("pixelMorphTheme");
-  if (saved) {
-    applyTheme(saved);
-  }
-  themeToggle.addEventListener("change", (event) => {
-    const next = event.target.checked ? "light" : "dark";
-    localStorage.setItem("pixelMorphTheme", next);
-    applyTheme(next);
-  });
-}
+// Theme logic moved to main.js
 
 function computeSimilarity(sourceRGBA, targetRGB, mapping) {
   if (!sourceRGBA || !targetRGB || !mapping) {

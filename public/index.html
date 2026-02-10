@@ -1,102 +1,249 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pixel-morph</title>
-    <link rel="stylesheet" href="../src/styles.css" />
-  </head>
-  <body>
-    <main class="wrap">
-      <aside class="sidebar">
-        <div class="brand">
-          <h1>Pixel Forge</h1>
-          <p>Permutation-driven morph lab.</p>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pixel Forge</title>
+  <link rel="stylesheet" href="../src/styles.css" />
+</head>
+
+<body>
+  <main class="wrap">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Pixel Forge</h1>
+        <p>Permutation-driven morph lab.</p>
+      </div>
+      <nav class="nav">
+        <a class="nav__link active" href="#home" data-view="home">Home</a>
+        <a class="nav__link" href="#scribble" data-view="scribble">Scribble</a>
+        <a class="nav__link" href="#info" data-view="info">Info</a>
+      </nav>
+    </aside>
+
+    <!-- HOME VIEW -->
+    <section id="view-home" class="view main">
+      <header class="header">
+        <div>
+          <h2>Live Workspace</h2>
+          <p>Upload input + target, then watch the morph.</p>
         </div>
-        <nav class="nav">
-          <a class="nav__link active" href="./index.html">Home</a>
-          <a class="nav__link" href="./scribble.html">Scribble</a>
-          <a class="nav__link" href="./info.html">Info</a>
-        </nav>
-      </aside>
+        <label class="theme-toggle">
+          <input id="themeToggle" type="checkbox" />
+          <span>Light Mode</span>
+        </label>
+      </header>
 
-      <section class="main">
-        <header class="header">
-          <div>
-            <h2>Live Workspace</h2>
-            <p>Upload input + target, then watch the morph.</p>
-          </div>
-          <label class="theme-toggle">
-            <input id="themeToggle" type="checkbox" />
-            <span>Light Mode</span>
+      <section class="controls">
+        <div class="controls__left">
+          <label class="upload">
+            <span>Upload Input</span>
+            <input id="homeFileInput" type="file" accept="image/*" />
           </label>
-        </header>
-
-        <section class="controls">
-          <div class="controls__left">
-            <label class="upload">
-              <span>Upload Input</span>
-              <input id="fileInput" type="file" accept="image/*" />
-            </label>
-            <label class="upload">
-              <span>Upload Target</span>
-              <input id="targetInput" type="file" accept="image/*" />
-            </label>
-          </div>
-          <label class="toggle">
-            <input id="debugToggle" type="checkbox" />
-            <span>Debug Permutation</span>
+          <label class="upload">
+            <span>Upload Target</span>
+            <input id="homeTargetInput" type="file" accept="image/*" />
           </label>
-        </section>
-
-        <section class="status">
-          <div class="stat">
-            <span class="label">Engine</span>
-            <span id="metricEngine" class="value">JS</span>
-          </div>
-          <div class="stat">
-            <span class="label">Progress</span>
-            <span id="metricProgress" class="value">0%</span>
-          </div>
-          <div class="stat">
-            <span class="label">Similarity</span>
-            <span id="metricSimilarity" class="value">--</span>
-          </div>
-        </section>
-
-        <section class="cards">
-          <article class="card">
-            <header class="card__header">
-              <h2>Input</h2>
-              <p>Source image</p>
-            </header>
-            <canvas id="inputCanvas" width="256" height="256"></canvas>
-          </article>
-
-          <article class="card">
-            <header class="card__header">
-              <h2>Target</h2>
-              <p>Fixed reference</p>
-            </header>
-            <canvas id="targetPreview" width="256" height="256"></canvas>
-          </article>
-
-          <article class="card">
-            <header class="card__header">
-              <h2>Output</h2>
-              <p>Permutation</p>
-            </header>
-            <canvas id="outputCanvas" width="256" height="256"></canvas>
-          </article>
-        </section>
+        </div>
+        <label class="toggle">
+          <input id="homeDebugToggle" type="checkbox" />
+          <span>Debug Permutation</span>
+        </label>
       </section>
-    </main>
 
-    <footer class="footer">
-      <span>Built by Armash</span>
-      <a href="https://github.com/armash66" target="_blank" rel="noreferrer">github.com/armash66</a>
-    </footer>
+      <section class="status">
+        <div class="stat">
+          <span class="label">Engine</span>
+          <span id="homeMetricEngine" class="value">JS</span>
+        </div>
+        <div class="stat">
+          <span class="label">Progress</span>
+          <span id="homeMetricProgress" class="value">0%</span>
+        </div>
+        <div class="stat">
+          <span class="label">Similarity</span>
+          <span id="homeMetricSimilarity" class="value">--</span>
+        </div>
+      </section>
 
-    <script type="module" src="../src/app.js"></script>
-  </body>
+      <section class="cards">
+        <article class="card">
+          <header class="card__header">
+            <h2>Input</h2>
+            <p>Source image</p>
+          </header>
+          <canvas id="homeInputCanvas" width="256" height="256"></canvas>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Target</h2>
+            <p>Fixed reference</p>
+          </header>
+          <canvas id="homeTargetPreview" width="256" height="256"></canvas>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Output</h2>
+            <p>Permutation</p>
+          </header>
+          <canvas id="homeOutputCanvas" width="256" height="256"></canvas>
+        </article>
+      </section>
+    </section>
+
+    <!-- SCRIBBLE VIEW -->
+    <section id="view-scribble" class="view main" style="display: none;">
+      <header class="header">
+        <div>
+          <h2>Scribble Workspace</h2>
+          <p>Draw, then watch it morph.</p>
+        </div>
+        <!-- Theme toggle is shared conceptually but duplicated in DOM for layout simplicity in this refactor -->
+        <div class="theme-toggle-placeholder"></div>
+      </header>
+
+      <section class="controls">
+        <div class="controls__left">
+          <label class="upload">
+            <span>Upload Target</span>
+            <input id="scribbleTargetInput" type="file" accept="image/*" />
+          </label>
+          <button id="scribbleClearBtn" class="upload">
+            <span>Clear</span>
+          </button>
+          <div class="slider-control">
+            <span>Brush Size</span>
+            <input id="scribbleBrushSize" type="range" min="1" max="50" value="12" />
+          </div>
+          <div class="color-control">
+            <button class="color-btn active" data-color="#f8fafc" style="background-color: #f8fafc;"
+              title="White"></button>
+            <button class="color-btn" data-color="#ef4444" style="background-color: #ef4444;" title="Red"></button>
+            <button class="color-btn" data-color="#3b82f6" style="background-color: #3b82f6;" title="Blue"></button>
+          </div>
+        </div>
+        <label class="toggle">
+          <input id="scribbleDebugToggle" type="checkbox" />
+          <span>Debug Permutation</span>
+        </label>
+      </section>
+
+      <section class="status">
+        <div class="stat">
+          <span class="label">Engine</span>
+          <span id="scribbleMetricEngine" class="value">JS</span>
+        </div>
+        <div class="stat">
+          <span class="label">Progress</span>
+          <span id="scribbleMetricProgress" class="value">0%</span>
+        </div>
+        <div class="stat">
+          <span class="label">Similarity</span>
+          <span id="scribbleMetricSimilarity" class="value">--</span>
+        </div>
+      </section>
+
+      <section class="cards">
+        <article class="card">
+          <header class="card__header">
+            <h2>Scribble</h2>
+            <p>Draw Here</p>
+          </header>
+          <canvas id="scribbleInputCanvas" width="256" height="256"></canvas>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Target</h2>
+            <p>Fixed reference</p>
+          </header>
+          <canvas id="scribbleTargetPreview" width="256" height="256"></canvas>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Morph</h2>
+            <p>Permutation</p>
+          </header>
+          <canvas id="scribbleOutputCanvas" width="256" height="256"></canvas>
+        </article>
+      </section>
+    </section>
+
+    <!-- INFO VIEW -->
+    <section id="view-info" class="view main" style="display: none;">
+      <header class="header">
+        <div>
+          <h2>How It Works</h2>
+          <p>Brightness sorting → permutation mapping → morph animation.</p>
+        </div>
+        <div class="theme-toggle-placeholder"></div>
+      </header>
+
+      <section class="hero">
+        <div>
+          <h3>Permutation-Only Morphing</h3>
+          <p>We rearrange your pixels into the target's structure using brightness ordering. No recoloring. No AI.</p>
+        </div>
+        <div class="hero__meta">
+          <span>Pure Math</span>
+          <span>Frontend Only</span>
+          <span>Deterministic</span>
+        </div>
+      </section>
+
+      <section class="cards">
+        <article class="card">
+          <header class="card__header">
+            <h2>Core Rules</h2>
+            <p>Pure math</p>
+          </header>
+          <ul class="info-list">
+            <li>No AI or recoloring.</li>
+            <li>Brightness = 0.2126R + 0.7152G + 0.0722B.</li>
+            <li>Sort source/target, map darkest-to-darkest.</li>
+            <li>Animate with linear interpolation.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Tips</h2>
+            <p>Best results</p>
+          </header>
+          <ul class="info-list">
+            <li>Use high-contrast targets.</li>
+            <li>Bold shapes read better.</li>
+            <li>Try simple inputs first.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Modes</h2>
+            <p>Home + Scribble</p>
+          </header>
+          <ul class="info-list">
+            <li>Home: upload input + target.</li>
+            <li>Scribble: draw your own input.</li>
+            <li>Debug mode proves permutation.</li>
+          </ul>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Built by Armash</span>
+    <a href="https://github.com/armash66" target="_blank" rel="noreferrer">github.com/armash66</a>
+  </footer>
+
+  <script type="module" src="../src/main.js"></script>
+  <script type="module" src="../src/app.js"></script>
+  <script type="module" src="../src/scribble.js"></script>
+</body>
+
 </html>
