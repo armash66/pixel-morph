@@ -19,6 +19,7 @@ const targetCtx = targetCanvas.getContext("2d");
 let latestSourceRGB = null;
 let latestTargetRGB = null;
 let latestMapping = null;
+let latestSourceRGBA = null;
 
 let wasmApi = null;
 let wasmReady = false;
@@ -69,11 +70,13 @@ function captureRGBInputs() {
   const sourcePixels = sourceCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   const targetPixels = targetCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
+  latestSourceRGBA = new Uint8ClampedArray(sourcePixels.data);
   latestSourceRGB = extractRGB(sourcePixels);
   latestTargetRGB = extractRGB(targetPixels);
 
   if (wasmReady) {
     latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+    renderStaticOutput();
   }
 }
 
@@ -95,6 +98,7 @@ function initWasm() {
 
     if (latestSourceRGB && latestTargetRGB) {
       latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+      renderStaticOutput();
     }
   });
 }
@@ -122,6 +126,29 @@ function computeMappingWasm(sourceRGB, targetRGB) {
   wasmApi.module._free(mapPtr);
 
   return mapping;
+}
+
+function renderStaticOutput() {
+  if (!latestMapping || !latestSourceRGBA) {
+    return;
+  }
+
+  const count = CANVAS_SIZE * CANVAS_SIZE;
+  const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
+  const outData = out.data;
+
+  for (let i = 0; i < count; i += 1) {
+    const targetIndex = latestMapping[i];
+    const srcIdx = i * 4;
+    const outIdx = targetIndex * 4;
+
+    outData[outIdx] = latestSourceRGBA[srcIdx];
+    outData[outIdx + 1] = latestSourceRGBA[srcIdx + 1];
+    outData[outIdx + 2] = latestSourceRGBA[srcIdx + 2];
+    outData[outIdx + 3] = 255;
+  }
+
+  outputCtx.putImageData(out, 0, 0);
 }
 
 function loadInput(file) {
