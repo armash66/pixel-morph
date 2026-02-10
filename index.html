@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>pixel-morph</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="header">
+        <h1>pixel-morph</h1>
+        <p>Upload an image to morph into the target.</p>
+      </header>
+
+      <section class="controls">
+        <label class="upload">
+          <span>Upload Image</span>
+          <input id="fileInput" type="file" accept="image/*" />
+        </label>
+      </section>
+
+      <section class="canvases">
+        <figure>
+          <figcaption>Input</figcaption>
+          <canvas id="inputCanvas" width="256" height="256"></canvas>
+        </figure>
+        <figure>
+          <figcaption>Target</figcaption>
+          <canvas id="targetCanvas" width="256" height="256"></canvas>
+        </figure>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
