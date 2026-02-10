@@ -56,8 +56,8 @@ body {
 }
 
 .canvases {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: flex;
+  justify-content: center;
   gap: 24px;
 }
 
@@ -67,6 +67,7 @@ figure {
   border: 1px solid #242833;
   padding: 16px;
   border-radius: 12px;
+  width: 380px;
 }
 
 figcaption {

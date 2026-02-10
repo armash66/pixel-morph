@@ -13,12 +13,12 @@ const TARGET_URL = "./assets/ww2%20hero.png";
 const sourceCanvas = document.createElement("canvas");
 sourceCanvas.width = CANVAS_SIZE;
 sourceCanvas.height = CANVAS_SIZE;
-const sourceCtx = sourceCanvas.getContext("2d");
+const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
 
 const targetCanvas = document.createElement("canvas");
 targetCanvas.width = CANVAS_SIZE;
 targetCanvas.height = CANVAS_SIZE;
-const targetCtx = targetCanvas.getContext("2d");
+const targetCtx = targetCanvas.getContext("2d", { willReadFrequently: true });
 
 let latestSourceRGB = null;
 let latestTargetRGB = null;
@@ -85,10 +85,24 @@ function captureRGBInputs() {
   }
 }
 
-function initWasm() {
-  createModule({
-    locateFile: (path) => new URL(`../wasm/build/${path}`, import.meta.url).toString(),
-  }).then((module) => {
+async function initWasm() {
+  try {
+    const module = await createModule({
+      locateFile: (path) => new URL(`../wasm/build/${path}`, import.meta.url).toString(),
+    });
+
+    await new Promise((resolve) => {
+      if (module.calledRun) {
+        resolve();
+        return;
+      }
+      module.onRuntimeInitialized = () => resolve();
+    });
+
+    if (!module.HEAPU8 || !module.HEAP32) {
+      throw new Error("WASM memory not ready (HEAPU8/HEAP32 missing).");
+    }
+
     wasmApi = {
       module,
       computeMapping: module.cwrap("compute_mapping", null, [
@@ -105,10 +119,21 @@ function initWasm() {
       latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
       startMorphAnimation();
     }
-  });
+  } catch (err) {
+    wasmReady = false;
+    console.error("WASM init failed:", err);
+  }
 }
 
 function computeMappingWasm(sourceRGB, targetRGB) {
+  if (!wasmReady || !wasmApi || !wasmApi.module) {
+    return null;
+  }
+  if (!wasmApi.module.HEAPU8 || !wasmApi.module.HEAP32) {
+    console.error("WASM memory not ready yet.");
+    return null;
+  }
+
   const count = CANVAS_SIZE * CANVAS_SIZE;
   const sourceBytes = sourceRGB.length;
   const targetBytes = targetRGB.length;
