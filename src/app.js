@@ -26,6 +26,7 @@ let latestMapping = null;
 let latestSourceRGBA = null;
 let animationId = null;
 let animationStart = 0;
+let warnedWasmUnavailable = false;
 
 let wasmApi = null;
 let wasmReady = false;
@@ -79,49 +80,59 @@ function captureRGBInputs() {
   latestSourceRGB = extractRGB(sourcePixels);
   latestTargetRGB = extractRGB(targetPixels);
 
-  if (wasmReady) {
-    latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+  latestMapping = computeMappingWithFallback(latestSourceRGB, latestTargetRGB);
+  if (latestMapping) {
     startMorphAnimation();
   }
 }
 
 async function initWasm() {
   try {
-    const module = await createModule({
+    let module = await createModule({
       locateFile: (path) => new URL(`../wasm/build/${path}`, import.meta.url).toString(),
+      onAbort: (reason) => console.error("WASM abort:", reason),
+      printErr: (msg) => console.error("WASM stderr:", msg),
     });
 
-    await new Promise((resolve) => {
-      if (module.calledRun) {
-        resolve();
-        return;
-      }
-      module.onRuntimeInitialized = () => resolve();
-    });
-
-    if (!module.HEAPU8 || !module.HEAP32) {
-      throw new Error("WASM memory not ready (HEAPU8/HEAP32 missing).");
+    if (module && typeof module.then === "function") {
+      module = await module;
     }
 
-    wasmApi = {
-      module,
-      computeMapping: module.cwrap("compute_mapping", null, [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-      ]),
-    };
+    if (module.ready) {
+      await module.ready;
+    }
+
+    if (!module.calledRun && module.onRuntimeInitialized) {
+      await new Promise((resolve) => {
+        module.onRuntimeInitialized = () => resolve();
+      });
+    }
+
+    if (!module.HEAPU8 || !module.HEAP32) {
+      return;
+    }
+
+    const computeMapping = module.cwrap("compute_mapping", null, [
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+    ]);
+
+    wasmApi = { module, computeMapping };
     wasmReady = true;
 
     if (latestSourceRGB && latestTargetRGB) {
-      latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
-      startMorphAnimation();
+      const mapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
+      if (mapping) {
+        latestMapping = mapping;
+        startMorphAnimation();
+      }
     }
   } catch (err) {
     wasmReady = false;
-    console.error("WASM init failed:", err);
+    // Silent fallback to JS mapping.
   }
 }
 
@@ -130,7 +141,6 @@ function computeMappingWasm(sourceRGB, targetRGB) {
     return null;
   }
   if (!wasmApi.module.HEAPU8 || !wasmApi.module.HEAP32) {
-    console.error("WASM memory not ready yet.");
     return null;
   }
 
@@ -155,6 +165,49 @@ function computeMappingWasm(sourceRGB, targetRGB) {
   wasmApi.module._free(targetPtr);
   wasmApi.module._free(mapPtr);
 
+  return mapping;
+}
+
+function computeMappingWithFallback(sourceRGB, targetRGB) {
+  const mapping = computeMappingWasm(sourceRGB, targetRGB);
+  if (mapping) {
+    return mapping;
+  }
+
+  if (!warnedWasmUnavailable) {
+    warnedWasmUnavailable = true;
+  }
+  return computeMappingJs(sourceRGB, targetRGB);
+}
+
+function brightnessOf(r, g, b) {
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function buildBrightnessList(rgb) {
+  const count = CANVAS_SIZE * CANVAS_SIZE;
+  const list = new Array(count);
+  for (let i = 0; i < count; i += 1) {
+    const idx = i * 3;
+    list[i] = {
+      index: i,
+      brightness: brightnessOf(rgb[idx], rgb[idx + 1], rgb[idx + 2]),
+    };
+  }
+  list.sort((a, b) => a.brightness - b.brightness);
+  return list;
+}
+
+function computeMappingJs(sourceRGB, targetRGB) {
+  if (!sourceRGB || !targetRGB) {
+    return null;
+  }
+  const sourceList = buildBrightnessList(sourceRGB);
+  const targetList = buildBrightnessList(targetRGB);
+  const mapping = new Int32Array(sourceList.length);
+  for (let i = 0; i < sourceList.length; i += 1) {
+    mapping[sourceList[i].index] = targetList[i].index;
+  }
   return mapping;
 }
 
