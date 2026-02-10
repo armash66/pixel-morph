@@ -273,6 +273,14 @@ body {
   margin-bottom: 14px;
 }
 
+[data-theme="light"] .upload,
+[data-theme="light"] .toggle {
+  background: #fff;
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.3);
+}
+
 .stat {
   background: rgba(2, 6, 23, 0.75);
   border: 1px solid var(--border);
@@ -280,6 +288,11 @@ body {
   padding: 10px 12px;
   display: grid;
   gap: 6px;
+}
+
+[data-theme="light"] .stat {
+  background: #fff;
+  border-color: var(--border);
 }
 
 .stat .label {
