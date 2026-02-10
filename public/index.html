@@ -14,48 +14,61 @@
       </header>
 
       <section class="controls">
-        <label class="upload">
-          <span>Upload Input</span>
-          <input id="fileInput" type="file" accept="image/*" />
-        </label>
-        <label class="upload">
-          <span>Upload Target</span>
-          <input id="targetInput" type="file" accept="image/*" />
-        </label>
+        <div class="controls__left">
+          <label class="upload">
+            <span>Upload Input</span>
+            <input id="fileInput" type="file" accept="image/*" />
+          </label>
+          <label class="upload">
+            <span>Upload Target</span>
+            <input id="targetInput" type="file" accept="image/*" />
+          </label>
+        </div>
         <label class="toggle">
           <input id="debugToggle" type="checkbox" />
           <span>Debug Permutation</span>
         </label>
       </section>
 
-      <section class="metrics">
-        <div class="metric">
+      <section class="status">
+        <div class="stat">
           <span class="label">Engine</span>
           <span id="metricEngine" class="value">JS</span>
         </div>
-        <div class="metric">
+        <div class="stat">
           <span class="label">Progress</span>
           <span id="metricProgress" class="value">0%</span>
         </div>
-        <div class="metric">
+        <div class="stat">
           <span class="label">Similarity</span>
           <span id="metricSimilarity" class="value">--</span>
         </div>
       </section>
 
-      <section class="canvases">
-        <figure>
-          <figcaption>Input</figcaption>
+      <section class="cards">
+        <article class="card">
+          <header class="card__header">
+            <h2>Input</h2>
+            <p>Source image</p>
+          </header>
           <canvas id="inputCanvas" width="256" height="256"></canvas>
-        </figure>
-        <figure>
-          <figcaption>Morph Output</figcaption>
-          <div class="target-preview">
-            <span>Target Preview</span>
-            <canvas id="targetPreview" width="128" height="128"></canvas>
-          </div>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Target</h2>
+            <p>Fixed reference</p>
+          </header>
+          <canvas id="targetPreview" width="256" height="256"></canvas>
+        </article>
+
+        <article class="card">
+          <header class="card__header">
+            <h2>Morph Output</h2>
+            <p>Permutation-only</p>
+          </header>
           <canvas id="outputCanvas" width="256" height="256"></canvas>
-        </figure>
+        </article>
       </section>
     </main>
 
