@@ -5,6 +5,7 @@ const ANIMATION_MS = 3200;
 
 const inputCanvas = document.getElementById("inputCanvas");
 const outputCanvas = document.getElementById("outputCanvas");
+const targetPreview = document.getElementById("targetPreview");
 const fileInput = document.getElementById("fileInput");
 const targetInput = document.getElementById("targetInput");
 const debugToggle = document.getElementById("debugToggle");
@@ -14,8 +15,9 @@ const metricSimilarity = document.getElementById("metricSimilarity");
 
 const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
+const previewCtx = targetPreview ? targetPreview.getContext("2d") : null;
 
-const targetUrl = "./assets/target-cat.svg";
+const targetUrl = "./assets/target-portrait-hi.svg";
 
 const sourceCanvas = document.createElement("canvas");
 sourceCanvas.width = CANVAS_SIZE;
@@ -60,6 +62,7 @@ function loadTarget() {
   const img = new Image();
   img.onload = () => {
     drawImageToCanvas(img, targetCtx);
+    drawPreview(img);
     captureRGBInputs();
   };
   img.src = targetUrl;
@@ -71,11 +74,27 @@ function loadTargetFromFile(file) {
     const img = new Image();
     img.onload = () => {
       drawImageToCanvas(img, targetCtx);
+      drawPreview(img);
       captureRGBInputs();
     };
     img.src = reader.result;
   };
   reader.readAsDataURL(file);
+}
+
+function drawPreview(img) {
+  if (!previewCtx) {
+    return;
+  }
+  previewCtx.clearRect(0, 0, targetPreview.width, targetPreview.height);
+  previewCtx.fillStyle = "#05070b";
+  previewCtx.fillRect(0, 0, targetPreview.width, targetPreview.height);
+  const scale = Math.min(targetPreview.width / img.width, targetPreview.height / img.height);
+  const drawWidth = img.width * scale;
+  const drawHeight = img.height * scale;
+  const dx = (targetPreview.width - drawWidth) / 2;
+  const dy = (targetPreview.height - drawHeight) / 2;
+  previewCtx.drawImage(img, dx, dy, drawWidth, drawHeight);
 }
 
 function extractRGB(imageData) {

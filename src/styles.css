@@ -147,3 +147,26 @@ canvas {
   border-radius: 8px;
   border: 1px solid #1f2a3d;
 }
+
+.target-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #1f2a3d;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: rgba(2, 6, 23, 0.7);
+  font-size: 12px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#targetPreview {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+}
