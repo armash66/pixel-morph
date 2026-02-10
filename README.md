@@ -19,19 +19,11 @@ In short: **your image’s colors, rearranged into the target’s shape**.
 6. Animate pixels from original positions to mapped target positions.
 
 ## Run Locally
-1. Build WASM (optional; JS fallback exists):
-   ```powershell
-   wasm\build.ps1
-   ```
-2. Serve the repo root:
+1. Start a local server:
    ```powershell
    python -m http.server 8080
    ```
-3. Open:
+2. Open:
    ```
    http://localhost:8080/public/index.html
    ```
-
-## Notes
-- If WASM fails to initialize, the app falls back to a pure‑JS implementation (same math).
-- The target image is stored at `public/assets/ww2 hero.png`.
