@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pixel Forge — Scribble</title>
+    <title>pixel-morph</title>
     <link rel="stylesheet" href="../src/styles.css" />
   </head>
   <body>
@@ -11,7 +11,7 @@
       <aside class="sidebar">
         <div class="brand">
           <h1>Pixel Forge</h1>
-          <p>Scribble-driven morph lab.</p>
+          <p>Permutation-driven morph lab.</p>
         </div>
         <nav class="nav">
           <a class="nav__link" href="./index.html">Home</a>
@@ -38,14 +38,18 @@
               <span>Upload Target</span>
               <input id="targetInput" type="file" accept="image/*" />
             </label>
-            <label class="upload">
+            <button id="clearBtn" class="upload">
               <span>Clear</span>
-              <button id="clearBtn" type="button">Reset Canvas</button>
-            </label>
-            <label class="upload">
+            </button>
+            <div class="slider-control">
               <span>Brush Size</span>
-              <input id="brushSize" type="range" min="4" max="40" value="14" />
-            </label>
+              <input id="brushSize" type="range" min="1" max="50" value="12" />
+            </div>
+            <div class="color-control">
+              <button class="color-btn active" data-color="#f8fafc" style="background-color: #f8fafc;" title="White"></button>
+              <button class="color-btn" data-color="#ef4444" style="background-color: #ef4444;" title="Red"></button>
+              <button class="color-btn" data-color="#3b82f6" style="background-color: #3b82f6;" title="Blue"></button>
+            </div>
           </div>
           <label class="toggle">
             <input id="debugToggle" type="checkbox" />
@@ -72,7 +76,7 @@
           <article class="card">
             <header class="card__header">
               <h2>Scribble</h2>
-              <p>Draw here</p>
+              <p>Draw Here</p>
             </header>
             <canvas id="inputCanvas" width="256" height="256"></canvas>
           </article>

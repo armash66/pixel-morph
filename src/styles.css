@@ -63,6 +63,7 @@ body {
   display: grid;
   gap: 18px;
   box-shadow: 0 16px 30px var(--shadow);
+  min-height: calc(100vh - 64px);
 }
 
 [data-theme="light"] .sidebar {
@@ -178,6 +179,58 @@ body {
   cursor: pointer;
   color: var(--text);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.4);
+}
+
+.slider-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slider-control span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.slider-control input[type="range"] {
+  width: 100px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.color-control {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+[data-theme="light"] .color-control {
+  background: #fff;
+}
+
+.color-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s;
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+}
+
+.color-btn.active {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 .upload input,

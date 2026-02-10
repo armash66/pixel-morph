@@ -14,6 +14,16 @@ const metricEngine = document.getElementById("metricEngine");
 const metricProgress = document.getElementById("metricProgress");
 const metricSimilarity = document.getElementById("metricSimilarity");
 const themeToggle = document.getElementById("themeToggle");
+const colorBtns = document.querySelectorAll(".color-btn");
+
+colorBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    // Remove active class from all
+    colorBtns.forEach((b) => b.classList.remove("active"));
+    // Add to clicked
+    btn.classList.add("active");
+  });
+});
 
 const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
@@ -331,7 +341,10 @@ function startMorphAnimation() {
 }
 
 function beginDraw(x, y) {
-  inputCtx.strokeStyle = "#f8fafc";
+  const activeColorBtn = document.querySelector(".color-btn.active");
+  const color = activeColorBtn ? activeColorBtn.dataset.color : "#f8fafc";
+
+  inputCtx.strokeStyle = color;
   inputCtx.lineWidth = Number(brushSize.value);
   inputCtx.lineCap = "round";
   inputCtx.lineJoin = "round";
