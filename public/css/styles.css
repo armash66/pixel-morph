@@ -37,6 +37,7 @@ body {
     radial-gradient(circle at 50% 100%, #1e293b, #0b0f14 60%);
   color: var(--text);
   min-height: 100vh;
+  overflow: hidden;
 }
 
 [data-theme="light"] body {
@@ -317,7 +318,8 @@ body {
 .hero__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
+  justify-content: start;
 }
 
 .hero__meta span {
