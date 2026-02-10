@@ -119,6 +119,7 @@ To run Pixel Forge locally, follow these steps:
 
 ## 📂 Project Structure
 
+```text
 pixel-morph/
 ├── public/                 # Publicly accessible assets
 │   ├── css/                # Stylesheets
