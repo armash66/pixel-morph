@@ -16,18 +16,16 @@ pnpm-debug.log*
 
 # Build outputs
 dist/
-# Build outputs
-dist/
 out/
+build/
 
-# WASM build output (allow public/wasm/build)
-!public/wasm/build/
-
-# Emscripten artifacts
-!public/wasm/build/*.wasm
+# Emscripten / WASM
+*.wasm
 *.js.map
 *.data
 *.mem
-
-# Emscripten SDK
 emsdk/
+
+# Explicitly allow deployment artifacts
+!public/wasm/build/
+!public/wasm/build/*.wasm
