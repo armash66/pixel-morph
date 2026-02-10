@@ -8,69 +8,101 @@
   </head>
   <body>
     <main class="wrap">
-      <header class="header">
-        <h1>pixel-morph</h1>
-        <p>Upload an image to morph into the target.</p>
-      </header>
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>pixel-morph</h1>
+          <p>Pure-math pixel permutation demo.</p>
+        </div>
+        <div class="info">
+          <h3>How It Works</h3>
+          <p>Pixels are sorted by brightness and reassigned to target positions.</p>
+          <p>No recoloring. No AI. Just math.</p>
+        </div>
+        <div class="info">
+          <h3>Tips</h3>
+          <ul>
+            <li>High-contrast targets look best.</li>
+            <li>Upload any input image.</li>
+          </ul>
+        </div>
+      </aside>
 
-      <section class="controls">
-        <div class="controls__left">
-          <label class="upload">
-            <span>Upload Input</span>
-            <input id="fileInput" type="file" accept="image/*" />
+      <section class="main">
+        <header class="header">
+          <div>
+            <h2>Live Workspace</h2>
+            <p>Upload input + target, then watch the morph.</p>
+          </div>
+          <label class="theme-toggle">
+            <input id="themeToggle" type="checkbox" />
+            <span>Light Mode</span>
           </label>
-          <label class="upload">
-            <span>Upload Target</span>
-            <input id="targetInput" type="file" accept="image/*" />
+        </header>
+
+        <section class="controls">
+          <div class="controls__left">
+            <label class="upload">
+              <span>Upload Input</span>
+              <input id="fileInput" type="file" accept="image/*" />
+            </label>
+            <label class="upload">
+              <span>Upload Target</span>
+              <input id="targetInput" type="file" accept="image/*" />
+            </label>
+          </div>
+          <label class="toggle">
+            <input id="debugToggle" type="checkbox" />
+            <span>Debug Permutation</span>
           </label>
-        </div>
-        <label class="toggle">
-          <input id="debugToggle" type="checkbox" />
-          <span>Debug Permutation</span>
-        </label>
-      </section>
+        </section>
 
-      <section class="status">
-        <div class="stat">
-          <span class="label">Engine</span>
-          <span id="metricEngine" class="value">JS</span>
-        </div>
-        <div class="stat">
-          <span class="label">Progress</span>
-          <span id="metricProgress" class="value">0%</span>
-        </div>
-        <div class="stat">
-          <span class="label">Similarity</span>
-          <span id="metricSimilarity" class="value">--</span>
-        </div>
-      </section>
+        <section class="status">
+          <div class="stat">
+            <span class="label">Engine</span>
+            <span id="metricEngine" class="value">JS</span>
+          </div>
+          <div class="stat">
+            <span class="label">Progress</span>
+            <span id="metricProgress" class="value">0%</span>
+          </div>
+          <div class="stat">
+            <span class="label">Similarity</span>
+            <span id="metricSimilarity" class="value">--</span>
+          </div>
+        </section>
 
-      <section class="cards">
-        <article class="card">
-          <header class="card__header">
-            <h2>Input</h2>
-            <p>Source image</p>
-          </header>
-          <canvas id="inputCanvas" width="256" height="256"></canvas>
-        </article>
+        <section class="cards">
+          <article class="card">
+            <header class="card__header">
+              <h2>Input</h2>
+              <p>Source image</p>
+            </header>
+            <canvas id="inputCanvas" width="256" height="256"></canvas>
+          </article>
 
-        <article class="card">
-          <header class="card__header">
-            <h2>Target</h2>
-            <p>Fixed reference</p>
-          </header>
-          <canvas id="targetPreview" width="256" height="256"></canvas>
-        </article>
+          <article class="card">
+            <header class="card__header">
+              <h2>Target</h2>
+              <p>Fixed reference</p>
+            </header>
+            <canvas id="targetPreview" width="256" height="256"></canvas>
+          </article>
 
-        <article class="card">
-          <header class="card__header">
-            <h2>Morph Output</h2>
-            <p>Permutation-only</p>
-          </header>
-          <canvas id="outputCanvas" width="256" height="256"></canvas>
-        </article>
+          <article class="card">
+            <header class="card__header">
+              <h2>Output</h2>
+              <p>Permutation</p>
+            </header>
+            <canvas id="outputCanvas" width="256" height="256"></canvas>
+          </article>
+        </section>
       </section>
     </main>
+
+    <footer class="footer">
+      <span>Built by Armash</span>
+      <a href="https://github.com/armash66" target="_blank" rel="noreferrer">github.com/armash66</a>
+    </footer>
 
     <script type="module" src="../src/app.js"></script>
   </body>

@@ -9,6 +9,7 @@ const targetPreview = document.getElementById("targetPreview");
 const fileInput = document.getElementById("fileInput");
 const targetInput = document.getElementById("targetInput");
 const debugToggle = document.getElementById("debugToggle");
+const themeToggle = document.getElementById("themeToggle");
 const metricEngine = document.getElementById("metricEngine");
 const metricProgress = document.getElementById("metricProgress");
 const metricSimilarity = document.getElementById("metricSimilarity");
@@ -455,6 +456,25 @@ clearCanvas(sourceCtx);
 clearCanvas(outputCtx);
 loadTarget();
 initWasm();
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  if (themeToggle) {
+    themeToggle.checked = theme === "light";
+  }
+}
+
+if (themeToggle) {
+  const saved = localStorage.getItem("pixelMorphTheme");
+  if (saved) {
+    applyTheme(saved);
+  }
+  themeToggle.addEventListener("change", (event) => {
+    const next = event.target.checked ? "light" : "dark";
+    localStorage.setItem("pixelMorphTheme", next);
+    applyTheme(next);
+  });
+}
 
 function computeSimilarity(sourceRGBA, targetRGB, mapping) {
   if (!sourceRGBA || !targetRGB || !mapping) {
