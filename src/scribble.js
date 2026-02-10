@@ -6,29 +6,25 @@ const ANIMATION_MS = 3200;
 const inputCanvas = document.getElementById("inputCanvas");
 const outputCanvas = document.getElementById("outputCanvas");
 const targetPreview = document.getElementById("targetPreview");
-const fileInput = document.getElementById("fileInput");
 const targetInput = document.getElementById("targetInput");
 const debugToggle = document.getElementById("debugToggle");
-const themeToggle = document.getElementById("themeToggle");
+const brushSize = document.getElementById("brushSize");
+const clearBtn = document.getElementById("clearBtn");
 const metricEngine = document.getElementById("metricEngine");
 const metricProgress = document.getElementById("metricProgress");
 const metricSimilarity = document.getElementById("metricSimilarity");
+const themeToggle = document.getElementById("themeToggle");
 
 const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d");
-const previewCtx = targetPreview ? targetPreview.getContext("2d") : null;
-
-const targetUrl = "./assets/ww2%20hero.png";
-
-const sourceCanvas = document.createElement("canvas");
-sourceCanvas.width = CANVAS_SIZE;
-sourceCanvas.height = CANVAS_SIZE;
-const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+const previewCtx = targetPreview.getContext("2d");
 
 const targetCanvas = document.createElement("canvas");
 targetCanvas.width = CANVAS_SIZE;
 targetCanvas.height = CANVAS_SIZE;
 const targetCtx = targetCanvas.getContext("2d", { willReadFrequently: true });
+
+const targetUrl = "./assets/ww2%20hero.png";
 
 let latestSourceRGB = null;
 let latestTargetRGB = null;
@@ -36,16 +32,14 @@ let latestMapping = null;
 let latestSourceRGBA = null;
 let animationId = null;
 let animationStart = 0;
-let warnedWasmUnavailable = false;
 let debugMode = false;
-let latestSimilarity = null;
 
 let wasmApi = null;
 let wasmReady = false;
 
 function clearCanvas(ctx) {
   ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  ctx.fillStyle = "#0b0d12";
+  ctx.fillStyle = "#05070b";
   ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 }
 
@@ -57,6 +51,18 @@ function drawImageToCanvas(img, ctx) {
   const dx = (CANVAS_SIZE - drawWidth) / 2;
   const dy = (CANVAS_SIZE - drawHeight) / 2;
   ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+}
+
+function drawPreview(img) {
+  previewCtx.clearRect(0, 0, targetPreview.width, targetPreview.height);
+  previewCtx.fillStyle = "#05070b";
+  previewCtx.fillRect(0, 0, targetPreview.width, targetPreview.height);
+  const scale = Math.min(targetPreview.width / img.width, targetPreview.height / img.height);
+  const drawWidth = img.width * scale;
+  const drawHeight = img.height * scale;
+  const dx = (targetPreview.width - drawWidth) / 2;
+  const dy = (targetPreview.height - drawHeight) / 2;
+  previewCtx.drawImage(img, dx, dy, drawWidth, drawHeight);
 }
 
 function loadTarget() {
@@ -83,26 +89,10 @@ function loadTargetFromFile(file) {
   reader.readAsDataURL(file);
 }
 
-function drawPreview(img) {
-  if (!previewCtx) {
-    return;
-  }
-  previewCtx.clearRect(0, 0, targetPreview.width, targetPreview.height);
-  previewCtx.fillStyle = "#05070b";
-  previewCtx.fillRect(0, 0, targetPreview.width, targetPreview.height);
-  const scale = Math.min(targetPreview.width / img.width, targetPreview.height / img.height);
-  const drawWidth = img.width * scale;
-  const drawHeight = img.height * scale;
-  const dx = (targetPreview.width - drawWidth) / 2;
-  const dy = (targetPreview.height - drawHeight) / 2;
-  previewCtx.drawImage(img, dx, dy, drawWidth, drawHeight);
-}
-
 function extractRGB(imageData) {
   const data = imageData.data;
   const count = CANVAS_SIZE * CANVAS_SIZE;
   const rgb = new Uint8Array(count * 3);
-
   for (let i = 0; i < count; i += 1) {
     const srcIdx = i * 4;
     const dstIdx = i * 3;
@@ -110,12 +100,11 @@ function extractRGB(imageData) {
     rgb[dstIdx + 1] = data[srcIdx + 1];
     rgb[dstIdx + 2] = data[srcIdx + 2];
   }
-
   return rgb;
 }
 
 function captureRGBInputs() {
-  const sourcePixels = sourceCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  const sourcePixels = inputCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   const targetPixels = targetCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
   latestSourceRGBA = new Uint8ClampedArray(sourcePixels.data);
@@ -124,8 +113,6 @@ function captureRGBInputs() {
 
   latestMapping = computeMappingWithFallback(latestSourceRGB, latestTargetRGB);
   if (latestMapping) {
-    latestSimilarity = computeSimilarity(latestSourceRGBA, latestTargetRGB, latestMapping);
-    updateSimilarityMetric();
     startMorphAnimation();
   }
 }
@@ -169,19 +156,8 @@ async function initWasm() {
     if (metricEngine) {
       metricEngine.textContent = "WASM";
     }
-
-    if (latestSourceRGB && latestTargetRGB) {
-      const mapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
-      if (mapping) {
-        latestMapping = mapping;
-        latestSimilarity = computeSimilarity(latestSourceRGBA, latestTargetRGB, latestMapping);
-        updateSimilarityMetric();
-        startMorphAnimation();
-      }
-    }
   } catch (err) {
     wasmReady = false;
-    // Silent fallback to JS mapping.
     if (metricEngine) {
       metricEngine.textContent = "JS";
     }
@@ -228,10 +204,6 @@ function computeMappingWithFallback(sourceRGB, targetRGB) {
     }
     return mapping;
   }
-
-  if (!warnedWasmUnavailable) {
-    warnedWasmUnavailable = true;
-  }
   if (metricEngine) {
     metricEngine.textContent = "JS";
   }
@@ -262,66 +234,11 @@ function computeMappingJs(sourceRGB, targetRGB) {
   }
   const sourceList = buildBrightnessList(sourceRGB);
   const targetList = buildBrightnessList(targetRGB);
-
-  // Split into "active" and "background" to reduce wasted pixels on black bars.
-  const threshold = 20;
-  const sourceActive = [];
-  const sourceBg = [];
-  for (const item of sourceList) {
-    if (item.brightness > threshold) {
-      sourceActive.push(item);
-    } else {
-      sourceBg.push(item);
-    }
-  }
-
-  const targetActive = [];
-  const targetBg = [];
-  for (const item of targetList) {
-    if (item.brightness > threshold) {
-      targetActive.push(item);
-    } else {
-      targetBg.push(item);
-    }
-  }
-
   const mapping = new Int32Array(sourceList.length);
-  const activeCount = Math.min(sourceActive.length, targetActive.length);
-  for (let i = 0; i < activeCount; i += 1) {
-    mapping[sourceActive[i].index] = targetActive[i].index;
+  for (let i = 0; i < sourceList.length; i += 1) {
+    mapping[sourceList[i].index] = targetList[i].index;
   }
-
-  // Map remaining pixels to remaining positions to keep a full permutation.
-  const sourceRest = sourceActive.slice(activeCount).concat(sourceBg);
-  const targetRest = targetActive.slice(activeCount).concat(targetBg);
-  for (let i = 0; i < sourceRest.length; i += 1) {
-    mapping[sourceRest[i].index] = targetRest[i].index;
-  }
-
   return mapping;
-}
-
-function renderStaticOutput() {
-  if (!latestMapping || !latestSourceRGBA) {
-    return;
-  }
-
-  const count = CANVAS_SIZE * CANVAS_SIZE;
-  const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
-  const outData = out.data;
-
-  for (let i = 0; i < count; i += 1) {
-    const targetIndex = latestMapping[i];
-    const srcIdx = i * 4;
-    const outIdx = targetIndex * 4;
-
-    outData[outIdx] = latestSourceRGBA[srcIdx];
-    outData[outIdx + 1] = latestSourceRGBA[srcIdx + 1];
-    outData[outIdx + 2] = latestSourceRGBA[srcIdx + 2];
-    outData[outIdx + 3] = 255;
-  }
-
-  outputCtx.putImageData(out, 0, 0);
 }
 
 function indexToXY(index) {
@@ -340,7 +257,6 @@ function renderMorphFrame(t) {
     return;
   }
 
-  // Permutation only: keep input colors, move to target positions.
   const count = CANVAS_SIZE * CANVAS_SIZE;
   const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
   const outData = out.data;
@@ -376,7 +292,6 @@ function renderMorphFrame(t) {
 }
 
 function debugColor(index) {
-  // Simple integer hash -> RGB
   let x = index + 1;
   x = (x ^ (x >>> 16)) * 0x45d9f3b;
   x = (x ^ (x >>> 16)) * 0x45d9f3b;
@@ -415,25 +330,49 @@ function startMorphAnimation() {
   animationId = requestAnimationFrame(animate);
 }
 
-function loadInput(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      drawImageToCanvas(img, inputCtx);
-      drawImageToCanvas(img, sourceCtx);
-      captureRGBInputs();
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+function beginDraw(x, y) {
+  inputCtx.strokeStyle = "#f8fafc";
+  inputCtx.lineWidth = Number(brushSize.value);
+  inputCtx.lineCap = "round";
+  inputCtx.lineJoin = "round";
+  inputCtx.beginPath();
+  inputCtx.moveTo(x, y);
 }
 
-fileInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    loadInput(file);
-  }
+function continueDraw(x, y) {
+  inputCtx.lineTo(x, y);
+  inputCtx.stroke();
+}
+
+let drawing = false;
+
+inputCanvas.addEventListener("pointerdown", (event) => {
+  drawing = true;
+  inputCanvas.setPointerCapture(event.pointerId);
+  const rect = inputCanvas.getBoundingClientRect();
+  beginDraw(event.clientX - rect.left, event.clientY - rect.top);
+});
+
+inputCanvas.addEventListener("pointermove", (event) => {
+  if (!drawing) return;
+  const rect = inputCanvas.getBoundingClientRect();
+  continueDraw(event.clientX - rect.left, event.clientY - rect.top);
+});
+
+inputCanvas.addEventListener("pointerup", () => {
+  drawing = false;
+  captureRGBInputs();
+});
+
+inputCanvas.addEventListener("pointerleave", () => {
+  if (!drawing) return;
+  drawing = false;
+  captureRGBInputs();
+});
+
+clearBtn.addEventListener("click", () => {
+  clearCanvas(inputCtx);
+  captureRGBInputs();
 });
 
 targetInput.addEventListener("change", (event) => {
@@ -449,13 +388,6 @@ debugToggle.addEventListener("change", (event) => {
     startMorphAnimation();
   }
 });
-
-
-clearCanvas(inputCtx);
-clearCanvas(sourceCtx);
-clearCanvas(outputCtx);
-loadTarget();
-initWasm();
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
@@ -476,43 +408,7 @@ if (themeToggle) {
   });
 }
 
-function computeSimilarity(sourceRGBA, targetRGB, mapping) {
-  if (!sourceRGBA || !targetRGB || !mapping) {
-    return null;
-  }
-  const count = CANVAS_SIZE * CANVAS_SIZE;
-  let sumSq = 0;
-  for (let i = 0; i < count; i += 1) {
-    const targetIndex = mapping[i];
-    const srcIdx = i * 4;
-    const outBrightness = brightnessOf(
-      sourceRGBA[srcIdx],
-      sourceRGBA[srcIdx + 1],
-      sourceRGBA[srcIdx + 2]
-    );
-    const tgtIdx = targetIndex * 3;
-    const tgtBrightness = brightnessOf(
-      targetRGB[tgtIdx],
-      targetRGB[tgtIdx + 1],
-      targetRGB[tgtIdx + 2]
-    );
-    const diff = outBrightness - tgtBrightness;
-    sumSq += diff * diff;
-  }
-
-  const mse = sumSq / count;
-  const maxMse = 255 * 255;
-  const score = Math.max(0, 1 - mse / maxMse);
-  return Math.round(score * 1000) / 10;
-}
-
-function updateSimilarityMetric() {
-  if (!metricSimilarity) {
-    return;
-  }
-  if (latestSimilarity === null) {
-    metricSimilarity.textContent = "--";
-    return;
-  }
-  metricSimilarity.textContent = `${latestSimilarity}%`;
-}
+clearCanvas(inputCtx);
+clearCanvas(outputCtx);
+loadTarget();
+initWasm();

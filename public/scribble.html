@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pixel-morph</title>
+    <title>pixel-morph — Scribble</title>
     <link rel="stylesheet" href="../src/styles.css" />
   </head>
   <body>
@@ -11,22 +11,22 @@
       <aside class="sidebar">
         <div class="brand">
           <h1>pixel-morph</h1>
-          <p>Pure-math pixel permutation demo.</p>
+          <p>Scribble and morph into the target.</p>
         </div>
         <nav class="nav">
-          <a class="nav__link active" href="./index.html">Home</a>
-          <a class="nav__link" href="./scribble.html">Scribble</a>
+          <a class="nav__link" href="./index.html">Home</a>
+          <a class="nav__link active" href="./scribble.html">Scribble</a>
         </nav>
         <div class="info">
           <h3>How It Works</h3>
-          <p>Pixels are sorted by brightness and reassigned to target positions.</p>
+          <p>Your strokes become pixels that are permuted into the target shape.</p>
           <p>No recoloring. No AI. Just math.</p>
         </div>
         <div class="info">
           <h3>Tips</h3>
           <ul>
-            <li>High-contrast targets look best.</li>
-            <li>Upload any input image.</li>
+            <li>Use bold strokes.</li>
+            <li>High contrast gives clearer morphs.</li>
           </ul>
         </div>
       </aside>
@@ -34,8 +34,8 @@
       <section class="main">
         <header class="header">
           <div>
-            <h2>Live Workspace</h2>
-            <p>Upload input + target, then watch the morph.</p>
+            <h2>Scribble Workspace</h2>
+            <p>Draw, then watch it morph.</p>
           </div>
           <label class="theme-toggle">
             <input id="themeToggle" type="checkbox" />
@@ -46,12 +46,16 @@
         <section class="controls">
           <div class="controls__left">
             <label class="upload">
-              <span>Upload Input</span>
-              <input id="fileInput" type="file" accept="image/*" />
-            </label>
-            <label class="upload">
               <span>Upload Target</span>
               <input id="targetInput" type="file" accept="image/*" />
+            </label>
+            <label class="upload">
+              <span>Clear</span>
+              <button id="clearBtn" type="button">Reset Canvas</button>
+            </label>
+            <label class="upload">
+              <span>Brush Size</span>
+              <input id="brushSize" type="range" min="4" max="40" value="14" />
             </label>
           </div>
           <label class="toggle">
@@ -78,8 +82,8 @@
         <section class="cards">
           <article class="card">
             <header class="card__header">
-              <h2>Input</h2>
-              <p>Source image</p>
+              <h2>Scribble</h2>
+              <p>Draw here</p>
             </header>
             <canvas id="inputCanvas" width="256" height="256"></canvas>
           </article>
@@ -94,8 +98,8 @@
 
           <article class="card">
             <header class="card__header">
-              <h2>Output</h2>
-              <p>Permutation</p>
+              <h2>Morph Output</h2>
+              <p>Permutation-only</p>
             </header>
             <canvas id="outputCanvas" width="256" height="256"></canvas>
           </article>
@@ -108,6 +112,6 @@
       <a href="https://github.com/armash66" target="_blank" rel="noreferrer">github.com/armash66</a>
     </footer>
 
-    <script type="module" src="../src/app.js"></script>
+    <script type="module" src="../src/scribble.js"></script>
   </body>
 </html>

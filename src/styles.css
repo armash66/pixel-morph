@@ -69,6 +69,39 @@ body {
   background: var(--panel);
 }
 
+.nav {
+  display: grid;
+  gap: 8px;
+}
+
+.nav__link {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  background: var(--panel-2);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.nav__link.active {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(249, 115, 22, 0.15));
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+[data-theme="light"] .nav__link {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .sidebar {
+  background: var(--panel);
+}
+
 .brand h1 {
   margin: 0 0 6px;
   font-size: 28px;
