@@ -1,6 +1,7 @@
 import createModule from "../wasm/build/morph.js";
 
 const CANVAS_SIZE = 256;
+const ANIMATION_MS = 3200;
 
 const sourceCanvas = document.getElementById("sourceCanvas");
 const outputCanvas = document.getElementById("outputCanvas");
@@ -20,6 +21,8 @@ let latestSourceRGB = null;
 let latestTargetRGB = null;
 let latestMapping = null;
 let latestSourceRGBA = null;
+let animationId = null;
+let animationStart = 0;
 
 let wasmApi = null;
 let wasmReady = false;
@@ -76,7 +79,7 @@ function captureRGBInputs() {
 
   if (wasmReady) {
     latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
-    renderStaticOutput();
+    startMorphAnimation();
   }
 }
 
@@ -98,7 +101,7 @@ function initWasm() {
 
     if (latestSourceRGB && latestTargetRGB) {
       latestMapping = computeMappingWasm(latestSourceRGB, latestTargetRGB);
-      renderStaticOutput();
+      startMorphAnimation();
     }
   });
 }
@@ -149,6 +152,68 @@ function renderStaticOutput() {
   }
 
   outputCtx.putImageData(out, 0, 0);
+}
+
+function indexToXY(index) {
+  return {
+    x: index % CANVAS_SIZE,
+    y: Math.floor(index / CANVAS_SIZE),
+  };
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function renderMorphFrame(t) {
+  if (!latestMapping || !latestSourceRGBA) {
+    return;
+  }
+
+  const count = CANVAS_SIZE * CANVAS_SIZE;
+  const out = new ImageData(CANVAS_SIZE, CANVAS_SIZE);
+  const outData = out.data;
+
+  for (let i = 0; i < count; i += 1) {
+    const targetIndex = latestMapping[i];
+    const start = indexToXY(i);
+    const end = indexToXY(targetIndex);
+
+    const x = Math.round(lerp(start.x, end.x, t));
+    const y = Math.round(lerp(start.y, end.y, t));
+    const outIdx = (y * CANVAS_SIZE + x) * 4;
+    const srcIdx = i * 4;
+
+    outData[outIdx] = latestSourceRGBA[srcIdx];
+    outData[outIdx + 1] = latestSourceRGBA[srcIdx + 1];
+    outData[outIdx + 2] = latestSourceRGBA[srcIdx + 2];
+    outData[outIdx + 3] = 255;
+  }
+
+  outputCtx.putImageData(out, 0, 0);
+}
+
+function animate(now) {
+  const elapsed = now - animationStart;
+  const t = Math.min(elapsed / ANIMATION_MS, 1);
+  renderMorphFrame(t);
+
+  if (t < 1) {
+    animationId = requestAnimationFrame(animate);
+  }
+}
+
+function startMorphAnimation() {
+  if (!latestMapping || !latestSourceRGBA) {
+    return;
+  }
+
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+  }
+
+  animationStart = performance.now();
+  animationId = requestAnimationFrame(animate);
 }
 
 function loadInput(file) {
